@@ -36,7 +36,7 @@ class UploadWPA extends Module
 	}
 	
 	private function sendWPAHandshake()
-    {
+	{
 		if(empty($this->request->email) && empty($this->request->wpafile))
 		{
 			$this->error = "Please specify your email address & path to wpa handshake capture file to upload...";
