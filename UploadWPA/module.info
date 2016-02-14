@@ -1,0 +1,6 @@
+{
+    "title": "UploadWPA",
+    "version": "1.0",
+    "author": "AlfAlfa",
+    "description": "Provides for directly uploading WPA hashes to online hash crackers: onlinehashcrack.com supported currently"
+}

@@ -1,0 +1,33 @@
+<div class="panel panel-default" ng-controller="UploadWPAController">
+	<div class="panel-heading">
+		<h3 class="panel-title">UploadWPA</h3>
+    </div>
+    <div class="panel-body">
+		<div class="panel-body" ng-hide="uploadwpaInstalled">
+			<i>uploadwpa cli must be installed first...</i>
+			<button class="btn btn-default" ng-click="uploadwpaInstallUninstall()">
+				Install uploadwpa dependency!
+			</button>
+		</div>
+		<div class="panel-body" ng-show="uploadwpaInstalled">
+			<i>Status: uploadwpa installed</i>
+			<button class="btn btn-default" ng-click="uploadwpaInstallUninstall()">
+				Uninstall uploadwpa dependency...
+			</button>
+		</div>
+		<div class="well alert-warning" ng-show="installedResult">
+			{{ installedResult }}
+		</div>
+		<div class="well alert-warning" ng-show="uploadedResult">
+			{{ uploadedResult }}
+		</div>
+		Email Address:</br><input class="input" type="text" ng-model="emailText"></br>
+		WPA Handshake Path:</br><input class="input" type="text" ng-model="wpaFilePath">
+		<button class="btn btn-default" ng-click="sendWPAHandshake()">
+			Upload WPA Handshake!
+		</button></p>
+		<div class="panel-body" ng-show="uploadwpaCommand">
+			uploadwpa -e {{ emailText }} -c {{ wpaFilePath }}
+		</div>
+    </div>
+</div>
