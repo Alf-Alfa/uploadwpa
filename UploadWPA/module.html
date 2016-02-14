@@ -26,8 +26,8 @@
 		<button class="btn btn-default" ng-click="sendWPAHandshake()">
 			Upload WPA Handshake!
 		</button></p>
-		<div class="panel-body" ng-show="uploadwpaCommand">
-			uploadwpa -e {{ emailText }} -c {{ wpaFilePath }}
+		<div class="panel-body" ng-show="emailText">
+			uploadwpa -e {{ emailText }} -c {{ wpaFilePath }} -v
 		</div>
     </div>
 </div>

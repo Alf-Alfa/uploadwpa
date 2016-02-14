@@ -29,7 +29,7 @@ registerController('UploadWPAController', ['$api', '$scope', function($api, $sco
 	{
 		$api.request({
 		module: 'UploadWPA',
-		action: 'handleUploadWPADepends',
+		action: 'handleUploadWPADepends'
         }, function(response){
             $scope.installedResult = response.control_message;
         });
