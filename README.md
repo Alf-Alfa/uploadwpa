@@ -16,12 +16,12 @@ uploadwpa -e youremail@yourdomain.com -a hash1 hash2 hash3 hash4 hash5 hash6 has
 uploadwpa -e example@example.com -a hash1 etc etc -c /path/to/capture.cap
 
 1. Compile uploadwpa cli:
-g++ -std=c++0x HTTPClient.cpp uploadwpa.cpp -o uploadwpa
+	g++ -std=c++0x HTTPClient.cpp uploadwpa.cpp -o uploadwpa
 
 You'll need to either cross compile it or have g++ or some kind of recent c++ compiler if you want it to be a pineapple module otherwise it'll be a linux application!
 
 2.
-copy the compiled binary 'uploadwpa' to /usr/bin or /usr/local/bin on your pineapple, or linux system.
+	Copy the compiled binary 'uploadwpa' to /usr/bin or /usr/local/bin on your pineapple, or linux system.
 
 3.
-Then copy UploadWPA folder containing the GUI part of the module to /pineapple/modules/ if your installing on a pineapple!
+	Then copy UploadWPA folder containing the GUI part of the module to /pineapple/modules/ if you're installing on a pineapple!

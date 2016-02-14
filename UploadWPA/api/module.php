@@ -2,53 +2,53 @@
 
 class UploadWPA extends Module
 {
-    public function route()
-    {
-        switch ($this->request->action)
+	public function route()
+	{
+		switch ($this->request->action)
 		{
 			case 'getDependencyStatus':
-                $this->getDependencyStatus();
-                break;
+				$this->getDependencyStatus();
+				break;
 			case 'handleUploadWPADepends':
-                $this->getDependencyStatus();
-                break;
+				$this->getDependencyStatus();
+				break;
 			case 'loadTempDataIfExists':
-                $this->loadTempDataIfExists();
-                break;
+				$this->loadTempDataIfExists();
+				break;
 
-            case 'sendWPAHandshake':
-                $this->sendWPAHandshake();
-                break;
-        }
-    }
+			case 'sendWPAHandshake':
+				$this->sendWPAHandshake();
+				break;
+		}
+	}
 
 	private function loadTempDataIfExists()
 	{
 		$tempEmailAddress = file_get_contents('/tmp/uploadwpa_temp');
-		if ($tempEmailAddress !== false)
+		if($tempEmailAddress !== false)
 		{
 			$this->response = $tempEmailAddress;
-        }
+		}
 		else
 		{
 			$this->error = "No temporarily saved email address to retrieve...";
 		}
 	}
-
-    private function sendWPAHandshake()
+	
+	private function sendWPAHandshake()
     {
-        if(empty($this->request->email) && empty($this->request->wpafile))
+		if(empty($this->request->email) && empty($this->request->wpafile))
 		{
-            $this->error = "Please specify your email address & path to wpa handshake capture file to upload...";
-        }
+			$this->error = "Please specify your email address & path to wpa handshake capture file to upload...";
+		}
 		else
 		{
-            file_put_contents('/tmp/uploadwpa_temp', $this->request->email . "\n");
+			file_put_contents('/tmp/uploadwpa_temp', $this->request->email . "\n");
 
 			$uploadwpaCommand = "uploadwpa -e " . $this->request->email . " -c " . $this->request->wpafile;
 			$this->response = array("commandResult" => exec($uploadwpaCommand));
-        }
-    }
+		}
+	}
 
 	private function getDependencyStatus()
 	{

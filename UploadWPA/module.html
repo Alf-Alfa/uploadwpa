@@ -1,8 +1,8 @@
 <div class="panel panel-default" ng-controller="UploadWPAController">
 	<div class="panel-heading">
 		<h3 class="panel-title">UploadWPA</h3>
-    </div>
-    <div class="panel-body">
+	</div>
+	<div class="panel-body">
 		<div class="panel-body" ng-hide="uploadwpaInstalled">
 			<i>uploadwpa cli must be installed first...</i>
 			<button class="btn btn-default" ng-click="uploadwpaInstallUninstall()">
@@ -29,5 +29,5 @@
 		<div class="panel-body" ng-show="emailText">
 			uploadwpa -e {{ emailText }} -c {{ wpaFilePath }} -v
 		</div>
-    </div>
+	</div>
 </div>
