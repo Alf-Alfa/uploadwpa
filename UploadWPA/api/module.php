@@ -6,12 +6,15 @@ class UploadWPA extends Module
 	{
 		switch ($this->request->action)
 		{
+			//When it get's accepted as an official module, I can uncomment this...
+			/*
 			case 'getDependencyStatus':
 				$this->getDependencyStatus();
 				break;
 			case 'handleUploadWPADepends':
 				$this->getDependencyStatus();
 				break;
+			*/
 			case 'loadTempDataIfExists':
 				$this->loadTempDataIfExists();
 				break;

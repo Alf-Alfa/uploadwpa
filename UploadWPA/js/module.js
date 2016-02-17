@@ -2,9 +2,10 @@ registerController('UploadWPAController', ['$api', '$scope', function($api, $sco
 	$scope.emailText = "";
 	$scope.wpaFilePath = "";
 	$scope.uploadedResult = "";
-	$scope.uploadwpaInstalled = false;
+	$scope.uploadwpaInstalled = true;
 
-	getDependencyStatus();
+	$scope.getTemporarilySavedEmail();
+	//getDependencyStatus(); //same here, uncomment when accepted as official module.
 
 	$scope.sendWPAHandshake = (function()
 	{
@@ -21,6 +22,23 @@ registerController('UploadWPAController', ['$api', '$scope', function($api, $sco
 			else
 			{
 				$scope.uploadedOutput = response.error;
+			}
+		});
+	});
+
+	$scope.getTemporarilySavedEmail = (function()
+	{
+		$api.request({
+		module: 'UploadWPA',
+		action: 'loadTempDataIfExists'
+		}, function(response){
+			if(response.error === undefined)
+			{
+				$scope.emailText = response;
+			}
+			else
+			{
+				$scope.emailText = "";
 			}
 		});
 	});

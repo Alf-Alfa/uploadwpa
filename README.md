@@ -15,13 +15,22 @@ uploadwpa -e youremail@yourdomain.com -a hash1 hash2 hash3 hash4 hash5 hash6 has
 {Send both sequentially:}
 uploadwpa -e example@example.com -a hash1 etc etc -c /path/to/capture.cap
 
-1. Compile uploadwpa cli:
+1. Compile uploadwpa cli for linux:
 	g++ -std=c++0x HTTPClient.cpp uploadwpa.cpp -o uploadwpa
 
-You'll need to either cross compile it or have g++ or some kind of recent c++ compiler if you want it to be a pineapple module otherwise it'll be a linux application!
+or
+
+1. Compile uploadwpa cli for pineapple nano & MK5 (mips architecture)
+  Get MK5 firmware and cross compilation toolkit here: http://wiki.wifipineapple.com/#!build_guide.md
+  Once set up and installed, from base directory execute 'make menuconfig', select "Base system", scroll down to libstdcpp and hit 'Y' exit and save.
+  Copy all files to and create new directory package/uploadwpa 
+  Execute 'make menuconfig' once again, scroll down to utilities, find newly listed 'uploadwpa' package and hit 'M', save and exit
+  Finally execute 'make package/uploadwpa/compile' and find newly created uploadwpa_1_ar71xx.ipk in bin/ar71xx/packages/
+  Copy that to your MK5 or nano and do opkg install uploadwpa_1_ar71xx.ipk to install it! :)
+  (Tetra instructions coming soon)
 
 2.
-	Copy the compiled binary 'uploadwpa' to /usr/bin or /usr/local/bin on your pineapple, or linux system.
+	Copy the compiled binary 'uploadwpa' to /usr/bin or /usr/local/bin on your linux system. If pineapple it should be installed already to the proper directory.
 
 3.
 	Then copy UploadWPA folder containing the GUI part of the module to /pineapple/modules/ if you're installing on a pineapple!

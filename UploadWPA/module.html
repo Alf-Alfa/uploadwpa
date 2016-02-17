@@ -4,16 +4,13 @@
 	</div>
 	<div class="panel-body">
 		<div class="panel-body" ng-hide="uploadwpaInstalled">
-			<i>uploadwpa cli must be installed first...</i>
+			<i>Status: uploadwpa cli must be installed first...</i>
 			<button class="btn btn-default" ng-click="uploadwpaInstallUninstall()">
 				Install uploadwpa dependency!
 			</button>
 		</div>
 		<div class="panel-body" ng-show="uploadwpaInstalled">
-			<i>Status: uploadwpa installed</i>
-			<button class="btn btn-default" ng-click="uploadwpaInstallUninstall()">
-				Uninstall uploadwpa dependency...
-			</button>
+			<i>Status: uploadwpa is installed</i>
 		</div>
 		<div class="well alert-warning" ng-show="installedResult">
 			{{ installedResult }}

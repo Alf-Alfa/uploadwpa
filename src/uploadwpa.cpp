@@ -8,7 +8,6 @@ int success = 0, verbose = 0;
 void printHelp()
 {
 	std::cout << "uploadwpa 1.0 ~ AlfAlfa\n";
-	std::cout << "BTC: 1GEKnNuVkMeMWiMcTQf8io2GqgCusQcK1E -> Support me with bitcoin if you like my work :)\n";
 	std::cout << "This module will upload a wpa handshake from a single capture file to www.onlinehashcrack.com\n";
 	std::cout << "or you can give it up to 10 hashes seperated by spaces and of any hashes the site supports\nUsage:\n";
 	std::cout << "{Send WPA Handshake:}\nuploadwpa -e youremail@yourdomain.com -c myaccesspoint.cap\n";
