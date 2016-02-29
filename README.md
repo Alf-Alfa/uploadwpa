@@ -16,7 +16,7 @@ BTC: 1GEKnNuVkMeMWiMcTQf8io2GqgCusQcK1E
  -> Automatically checks to make sure the capture file specified has a valid handshake before sending it out to the site(s) of your choice.
     *customize command that does this with "handshakeCheckCommand" json property. "$filepath" get's replaced  with passed in capture file path,
 	and the "handshakeCheckValid" string is what to look for in output when there is a valid handshake.
-    *Also "handshakeCheckEnabled" can be set to false to disable this handshake validating, or pass argument -nc / --no-check
+    *Also "handshakeCheckEnabled" can be set to false to disable this handshake validating, or pass argument -s 1 / --skip 1
 
  -> More improvements!
 
