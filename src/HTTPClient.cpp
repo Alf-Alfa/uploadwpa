@@ -33,85 +33,69 @@ bool HTTPClient::Connect(const char *host, int port)
 	return true;
 }
 
-bool HTTPClient::Get(const char *page)
+bool HTTPClient::Get(std::string page)
 {
-    if(!page) return false;
+    if(page.empty()) return false;
 
-	request = "GET ";
-	request += page;
-	request += " HTTP/1.1\r\n";
+	request = "GET " + page + " HTTP/1.1\r\n";
 	if(!host.empty())
 		request += "Host: " + host + "\r\n";
-	request += userAgent + "\r\n";
+	request += "User-Agent: " + userAgent + "\r\n";
 	request += "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n";
 	request += "Accept-Language: en-US,en;q=0.5\r\n";
-	request += "Accept-Encoding: gzip, deflate\r\n";
+	request += "Accept-Encoding: " + acceptEncoding + "\r\n";
 	if(!referer.empty())
 		request += "Referer: " + referer + "\r\n";
 	request += "Connection: keep-alive\r\n\r\n";
 	requestHeaders = request;
-	Log("\n[Request: ]");
-	Log(request, true);
+	Log("\n[Request: ]\n" + request);
 
 	return WriteRequestReadResponse();
 }
 
-bool HTTPClient::Post(const char *page, const char *data)
+bool HTTPClient::Post(std::string page, std::string &data)
 {
-    if(!page || !data) return false;
+    if(page.empty() || data.empty()) return false;
 
-    request = "POST ";
-    request += page;
-    request += " HTTP/1.1\r\n";
+    request = "POST " + page + " HTTP/1.1\r\n";
     if(!host.empty())
 		request += "Host: " + host + "\r\n";
-	request += userAgent + "\r\n";
+	request += "User-Agent: " + userAgent + "\r\n";
 	request += "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n";
 	request += "Accept-Language: en-US,en;q=0.5\r\n";
-	request += "Accept-Encoding: identity\r\n"; //gzip, deflate
+	request += "Accept-Encoding: " + acceptEncoding + "\r\n";
 	if(!referer.empty())
 		request += "Referer: " + referer + "\r\n";
 	request += "Connection: keep-alive\r\n";
 	request += "Content-Type: application/x-www-form-urlencoded\r\n";
-	request += "Content-Length: ";
-	char dataLenStr[21]{0};
-    sprintf(dataLenStr, "%lu", strlen(data));
-	request += dataLenStr;
-	request += "\r\n\r\n";
+	request += "Content-Length: " + std::to_string(data.size()) + "\r\n\r\n";
 	requestHeaders = request;
 	request += data;
 	request += "\r\n\r\n";
-	Log("\n[Request: ]");
-	Log(request, true);
+	Log("\n[Request: ]\n" + request);
 
 	return WriteRequestReadResponse();
 }
 
-bool HTTPClient::PostMultiPart(const char *page, std::string &data, std::string &boundary)
+bool HTTPClient::PostMultiPart(std::string page, std::string &data, std::string boundary)
 {
-    if(!page || data.empty()) return false;
+    if(page.empty() || data.empty()) return false;
 
-    request = "POST ";
-    request += page;
-    request += " HTTP/1.1\r\n";
+    request = "POST " + page + " HTTP/1.1\r\n";
     if(!host.empty())
 		request += "Host: " + host + "\r\n";
-	request += userAgent + "\r\n";
+	request += "User-Agent: " + userAgent + "\r\n";
 	request += "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n";
 	request += "Accept-Language: en-US,en;q=0.5\r\n";
-	request += "Accept-Encoding: identity\r\n";
+	request += "Accept-Encoding: " + acceptEncoding + "\r\n";
 	if(!referer.empty())
 		request += "Referer: " + referer + "\r\n";
 	request += "Connection: keep-alive\r\n";
 	request += "Content-Type: multipart/form-data; boundary=" + boundary + "\r\n";
-	request += "Content-Length: ";
-	char dataLenStr[21]{0};
-    sprintf(dataLenStr, "%lu", data.size());
-	request += dataLenStr;
-	request += "\r\n\r\n";
+	request += "Content-Length: " + std::to_string(data.size()) + "\r\n\r\n";
+
 	requestHeaders = request;
-	Log("\n[Request: ]");
-	Log(request.c_str(), true);
+    Log("\n[Request: ]\n" + request);
 
 	request += data;
 	request += "\r\n\r\n";
@@ -143,33 +127,81 @@ size_t HTTPClient::interpretResponse()
     size_t headerSize = (endOfHeader - startOfHeader) + 4;
     responseHeaders.resize(headerSize);
     bcopy(response.get(), (void*)responseHeaders.data(), headerSize);
-    offset = headerSize;
+    dataStartOffset = offset = headerSize;
 
-    Log("\n[Response Headers: ]"); //more work needs to be done here, to make sure to get the whole response
-    Log(responseHeaders.c_str());  //eg. get the content length and however many bytes recieved of it so far, then get the rest if necessary.
+    Log("\n[Response Headers: ]\n" + responseHeaders);
+    //more work needs to be done here, implement chunked transfer encoding...
+    if(responseHeaders.find("Transfer-Encoding: chunked") != std::string::npos)
+    {
+        Log("Chunked Transfer Encoding... {Not yet implemented}");
+    }
+    else
+    {
+        size_t pos = responseHeaders.find("Content-Length:");
+        if(pos != std::string::npos)
+        {
+            pos += 15;
+            while(responseHeaders[pos] == ' ') { pos++; }
+            size_t posEnd = responseHeaders.find("\r\n", pos);
+            std::string contentLength = responseHeaders.substr(pos, (posEnd - pos));
+            size_t contentLen = strtoull(contentLength.c_str(), 0, 10);
+            size_t bytesReceived = responseSize - offset;
+            size_t bytesRemaining = contentLen - bytesReceived;
+            Log("bytesReceived: " + std::to_string(bytesReceived) + ", bytesRemaining: " + std::to_string(bytesRemaining));
 
-    return headerSize;
+            while(bytesRemaining > 0)
+            {
+                int readNum = Read(responseSize + bytesRemaining);
+                Log("Read # bytes: " + std::to_string(readNum));
+                if(readNum > 0)
+                {
+                    bytesRemaining -= readNum;
+                }
+                else
+                    break;
+            }
+        }
+
+        Log("\n[Data: ]");
+        Log(&response.get()[dataStartOffset]);
+    }
+
+    return responseSize;
+}
+
+void HTTPClient::clearResponse()
+{
+    offset = responseSize = 0;
+    bzero(response.get(), bufferSize);
 }
 
 int HTTPClient::Read(int maxBytes)
 {
 	if(!response.get() || (bufferSize < maxBytes))
 	{
+        std::unique_ptr<char[]> oldResponse;
+        if(response.get())
+        {
+            oldResponse = std::move(response);
+            maxBytes += responseSize;
+        }
 		response = std::unique_ptr<char[]>(new char[maxBytes]);
 		bufferSize = maxBytes;
+		offset = responseSize;
+		bcopy(oldResponse.get(), response.get(), responseSize);
 	}
-	if(!response.get()) return -1;
-	bzero(response.get(), bufferSize);
+	if(!response.get()) return 0;
+	clearResponse();
 
-	Log("recieving...");
-	int num = recv(sock, response.get(), maxBytes, 0);
+	Log("receiving...");
+	int num = recv(sock, &response.get()[offset], (maxBytes - offset), 0);
 	if(num <= 0)
 	{
 		Log("ERROR reading from socket");
 		return 0;
 	}
 
-    responseSize = num;
+    responseSize += num;
 	return num;
 }
 
@@ -207,11 +239,11 @@ std::string HTTPClient::getRandomBoundary()
             for(int i = 0; i < 2; i++)
             {
                 char randomNum[30];
-                sprintf(randomNum,"%lu",random128bits[i]);
+                sprintf(randomNum, "%" PRIu64 "",random128bits[i]);
                 randomBoundary += randomNum;
             }
 
-            srand(time(0));
+
             int losehowmanydigits = rand() % 3 + 11;
             randomBoundary.resize(randomBoundary.size()-losehowmanydigits);
             //resulting in a 23 - 29 digit number appended to 27 dashes (like how iceweasal does it)
@@ -221,12 +253,12 @@ std::string HTTPClient::getRandomBoundary()
     return "";
 }
 
-std::string HTTPClient::urlEncode(std::string str)
+std::string HTTPClient::urlEncode(std::string Str)
 {
     std::string new_str = "";
     char c;
     int ic;
-    const char* chars = str.c_str();
+    const char* chars = Str.c_str();
     char bufHex[10];
     int len = strlen(chars);
 
@@ -251,24 +283,24 @@ std::string HTTPClient::urlEncode(std::string str)
     return new_str;
  }
 
-std::string HTTPClient::urlDecode(std::string str)
+std::string HTTPClient::urlDecode(std::string Str)
 {
     std::string ret;
     char ch;
-    int i, ii, len = str.length();
+    int i, ii, len = Str.length();
 
     for (i=0; i < len; i++)
     {
-        if(str[i] != '%')
+        if(Str[i] != '%')
         {
-            if(str[i] == '+')
+            if(Str[i] == '+')
                 ret += ' ';
             else
-                ret += str[i];
+                ret += Str[i];
         }
         else
         {
-            sscanf(str.substr(i + 1, 2).c_str(), "%x", &ii);
+            sscanf(Str.substr(i + 1, 2).c_str(), "%x", &ii);
             ch = static_cast<char>(ii);
             ret += ch;
             i = i + 2;
@@ -277,11 +309,16 @@ std::string HTTPClient::urlDecode(std::string str)
     return ret;
 }
 
-template<class T> void HTTPClient::Log(T str, bool noNewline)
+template<class T> void HTTPClient::Log(T Str, bool noNewline)
 {
     if(verbosity > 0)
     {
-        std::cout << str;
+        std::cout << Str;
         if(!noNewline) std::cout << "\n";
     }
+}
+
+template<class T> void HTTPClient::Log(T Str)
+{
+    Log(Str, false);
 }
